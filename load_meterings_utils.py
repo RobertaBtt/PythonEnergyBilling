@@ -115,7 +115,8 @@ def get_kwh_days(energy_meterings: List, bill_date: datetime) ->(float, int):
 
     #meterings is a subset of the whole data set
     meterings = get_meterings_bill_date(energy_meterings, bill_date)
-
+    kwh = 0.
+    days = 0
     if meterings is not None:
         month_before_bill = minus_one_month(bill_date)
 
@@ -133,7 +134,7 @@ def get_kwh_days(energy_meterings: List, bill_date: datetime) ->(float, int):
 
         days = days_between(month_before_bill, bill_date)
     else:
-        print("Data is not correct or compatible")
+        print("Meter readings not found for the bill_date provided")
 
     return kwh,days
 
