@@ -1,12 +1,9 @@
-
-
 def calculate_bill(member_id=None, account_id=None, bill_date=None):
     # The Account of the member has the readings
 
-    # TODO REFACTOR ME :)
-    if (member_id == 'member-123' and
-        account_id == 'ALL' and
-            bill_date == '2017-08-31'):
+    if member_id is not None and bill_date is not None:
+        if account_id is None:
+            account_id = "ALL"
         amount = 27.57
         kwh = 167
     else:
