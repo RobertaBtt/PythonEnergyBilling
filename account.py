@@ -23,3 +23,11 @@ class Account:
     @member.setter
     def member(self, member):
         self._member = member
+
+    @property
+    def service_type(self):
+        return self._service_type
+
+    @service_type.setter
+    def service_type(self, service_type):
+        self._service_type = service_type

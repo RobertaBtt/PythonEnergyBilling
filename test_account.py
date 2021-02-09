@@ -23,3 +23,7 @@ class TestAccount(unittest.TestCase):
     def testInstanceSetAccountId(self):
         self.account.account_id = "account-abc"
         assert self.account.account_id == "account-abc"
+
+    def testInstanceSetServiceType(self):
+        self.account.service_type = "electricity"
+        assert self.account.service_type == "electricity"
