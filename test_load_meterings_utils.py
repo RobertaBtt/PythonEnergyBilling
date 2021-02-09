@@ -123,5 +123,12 @@ class TestLoadMeteringsUtils(unittest.TestCase):
         energy_meterings = deserialize_list(get_readings(), "member-123", "account-abc", "electricity")
         billing_date = to_date("2017-08-31")
         kwh, days = get_kwh_days(energy_meterings, billing_date)
-        amount =round(((24.56/100.0)*days) + ((11.949/100.0)*kwh), 2)
+        amount = round(((24.56/100.0)*days) + ((11.949/100.0)*kwh), 2)
+        assert get_amount(kwh, days) == amount
+
+    def testGetAmount(self):
+        energy_meterings = deserialize_list(get_readings(), "member-123", "account-abc", "electricity")
+        billing_date = to_date("2017-09-30")
+        kwh, days = get_kwh_days(energy_meterings, billing_date)
+        amount = 29.12
         assert get_amount(kwh, days) == amount
