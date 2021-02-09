@@ -1,49 +1,54 @@
 import unittest
 from load_readings import get_readings
 from load_meterings import deserialize_one
-from load_meterings import deserialize_list
+from load_meterings import getAccountMeterReadings
+from account import Account
 
 class TestLoadMeterings(unittest.TestCase):
 
     def setUp(self) -> None:
         self.readings = get_readings()
-        self.account_id = "account-abc"
-        self.service_type = "electricity"
-        self.account_fake = "account_fake"
-        self.member_id = "member-123"
-        self.service_fake = "smarthome"
-        self.all_accounts = "ALL"
+        self.account = Account()
+        self.account.service_type = "electricity"
+        self.account.member_id = "member-123"
+        self.account.readings = get_readings()
+        self.account.account_id = "account-abc"
 
     def testDeserializeOne(self):
-        content = self.readings[self.member_id]
-        result = deserialize_one(content, self.account_id, self.service_type)
+        content = self.readings[self.account.member_id]
+        result = deserialize_one(content, self.account.account_id, self.account.service_type)
         assert result is not None
         assert len(result) == 14
 
     def testDeserializeOneAccountUnavailable(self):
-        content = self.readings[self.member_id]
+        content = self.readings[self.account.member_id]
+        self.account.account_id = "fakeAccount"
         with self.assertRaises(KeyError):
-            deserialize_one(content, self.account_fake, self.service_type)
+            deserialize_one(content, self.account.account_id, self.account.service_type)
 
     def testDeserializeOneServiceTypeNotValid(self):
-        content = self.readings[self.member_id]
+        content = self.readings[self.account.member_id]
+        self.account.service_type = "smartHome"
         with self.assertRaises(KeyError):
-            deserialize_one(content, self.account_id, self.service_fake)
+            deserialize_one(content, self.account.account_id, self.account.service_type)
 
     def testDeserializeOneEmpty(self):
-        assert deserialize_one(None, self.account_id, self.service_fake) is None
+        self.account.service_type = "smartHome"
+        assert deserialize_one(None, self.account.account_id, self.account.service_type) is None
 
     def testDeserializeOneNotAList(self):
-        assert deserialize_one(1, self.account_id, self.service_fake) is None
+        self.account.service_type = "smartHome"
+        assert deserialize_one(1, self.account.account_id, self.account.service_type) is None
 
     def testDeserializeList(self):
-        result = deserialize_list(self.readings, self.member_id, self.account_id,  self.service_type)
+        result = getAccountMeterReadings(self.account)
         assert result is not None
         assert(len(result) == 14)
 
     def testDeserializeListAllAccounts(self):
         #When accounts are "ALL", the result is a list of the list of the accounts.
-        result = deserialize_list(self.readings, self.member_id, self.all_accounts,  self.service_type)
+        self.account.account_id = "ALL"
+        result = getAccountMeterReadings(self.account)
         assert result is not None
         #This is a list of lists
         assert(len(result) == 1)

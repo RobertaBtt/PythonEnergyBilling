@@ -1,8 +1,9 @@
 import unittest
 from load_readings import get_readings
 from load_meterings import deserialize_one
-from load_meterings import deserialize_list
+from load_meterings import getAccountMeterReadings
 from load_meterings_utils import *
+from account import Account
 
 class TestLoadMeteringsUtils(unittest.TestCase):
 
@@ -13,7 +14,14 @@ class TestLoadMeteringsUtils(unittest.TestCase):
 
         #Whole meter reading list
         self.readings = get_readings()
-        self.meter_readings_list = deserialize_list(self.readings, "member-123", "account-abc", "electricity")
+        self.account = Account()
+        self.account.service_type = "electricity"
+        self.account.member_id = "member-123"
+        self.account.readings = get_readings()
+        self.account.account_id = "account-abc"
+
+
+        self.meter_readings_list = getAccountMeterReadings(self.account)
 
     def testKwhBetween(self):
         result = kwh_between(self.reading_begin, self.reading_end)
@@ -113,21 +121,21 @@ class TestLoadMeteringsUtils(unittest.TestCase):
         assert kwh_total == 3020
 
     def testGetKwhDays(self):
-        energy_meterings = deserialize_list(get_readings(), "member-123", "account-abc", "electricity")
+        energy_meterings = getAccountMeterReadings(self.account)
         billing_date = to_date("2017-08-31")
         kwh, days = get_kwh_days(energy_meterings, billing_date)
         # kwh are: 18620 - 18453 = 167
         assert (kwh, days) == (167,31)
 
     def testGetAmount(self):
-        energy_meterings = deserialize_list(get_readings(), "member-123", "account-abc", "electricity")
+        energy_meterings = getAccountMeterReadings(self.account)
         billing_date = to_date("2017-08-31")
         kwh, days = get_kwh_days(energy_meterings, billing_date)
         amount = round(((24.56/100.0)*days) + ((11.949/100.0)*kwh), 2)
         assert get_amount(kwh, days) == amount
 
     def testGetAmount(self):
-        energy_meterings = deserialize_list(get_readings(), "member-123", "account-abc", "electricity")
+        energy_meterings = getAccountMeterReadings(self.account)
         billing_date = to_date("2017-09-30")
         kwh, days = get_kwh_days(energy_meterings, billing_date)
         amount = 29.12

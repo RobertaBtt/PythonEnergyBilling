@@ -1,6 +1,7 @@
 DESERIALIZERS = dict()
 
 from typing import List
+from account import Account
 
 def register(func):
     """Register a function that can deserialize different formats"""
@@ -20,22 +21,23 @@ def YAML(readings, key):
     raise NotImplementedError
 
 
-def deserialize_list(readings:List, member_id:str, account_id:str, service_type):
+def getAccountMeterReadings(account: Account) ->List:
     account_list = []
     try:
-        member_id = get(readings, "JSON", member_id)
-        if account_id == "ALL":
+        member_id = get(account.readings, "JSON", account.member_id)
+        if account.account_id == "ALL":
             # This is a list of dictionaries with key <<account_id>>
             for accounts in member_id:
                 #A member can have more than one account
                 for account_id, values in accounts.items():
-                    account_list.append(deserialize_one(member_id, account_id, service_type))
+                    account_list.append(deserialize_one(member_id, account_id, account.service_type))
         else:
-            return deserialize_one(member_id, account_id, service_type)
+            return deserialize_one(member_id, account.account_id, account.service_type)
         return account_list
 
     except Exception as ex:
         raise ex
+
 
 def deserialize_one(readings:List, account_id:str, service_type: str):
     if readings is not None and isinstance(readings, List):
@@ -52,6 +54,7 @@ def deserialize_one(readings:List, account_id:str, service_type: str):
             else:
                 print("Account",account_id,"not found")
                 raise KeyError
+
 
 def get(readings, format, key):
     deserializer = DESERIALIZERS[format]

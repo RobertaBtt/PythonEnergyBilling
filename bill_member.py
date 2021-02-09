@@ -1,12 +1,17 @@
-from load_date_utils import *
 from load_meterings_utils import *
 from load_meterings import *
 from load_readings import get_readings
-from tariff import BULB_TARIFF
+from account import Account
+
+def _prepare_account_instance(member_id:str, account_id: str) -> Account:
+    account = Account()
+    account.service_type = "electricity"
+    account.member_id = member_id
+    account.readings = get_readings()
+    account.account_id = account_id
+    return account
 
 def calculate_bill(member_id=None, account_id=None, bill_date=None):
-    # The Account of the member has the readings
-    service_type = "electricity"
     amount = 0.
     kwh = 0
     days = 0
@@ -14,7 +19,7 @@ def calculate_bill(member_id=None, account_id=None, bill_date=None):
         try:
             billing_date = to_date(bill_date)
 
-            energy_meterings = deserialize_list(get_readings(), member_id, account_id, service_type)
+            energy_meterings = getAccountMeterReadings(_prepare_account_instance(member_id, account_id))
             #ALL accounts
             if isinstance(energy_meterings[0], list):
                 for energy in energy_meterings:
