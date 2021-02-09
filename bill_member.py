@@ -26,7 +26,7 @@ def calculate_bill(member_id=None, account_id=None, bill_date=None):
                 (kwh, days) = get_kwh_days(energy_meterings, billing_date)
 
         except Exception as ex:
-            print(ex + "\n(kwh= 0 and amount=0 will be returned)")
+            print(ex, "\n(kwh= 0 and amount=0 will be returned)")
 
     amount = get_amount(kwh, days)
 
