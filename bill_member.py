@@ -1,14 +1,35 @@
+from load_date_utils import *
+from load_meterings_utils import *
+from load_meterings import *
+from load_readings import get_readings
+from tariff import BULB_TARIFF
+
 def calculate_bill(member_id=None, account_id=None, bill_date=None):
     # The Account of the member has the readings
-
+    service_type = "electricity"
+    amount = 0.
+    kwh = 0
+    days = 0
     if member_id is not None and bill_date is not None:
-        if account_id is None:
-            account_id = "ALL"
-        amount = 27.57
-        kwh = 167
-    else:
-        amount = 0.
-        kwh = 0
+        try:
+            billing_date = to_date(bill_date)
+
+            energy_meterings = deserialize_list(get_readings(), member_id, account_id, service_type)
+            #ALL accounts
+            if isinstance(energy_meterings[0], list):
+                for energy in energy_meterings:
+                    result = get_kwh_days(energy, billing_date)
+                    kwh += result[0]
+                    days += result[1]
+
+            else:
+                (kwh, days) = get_kwh_days(energy_meterings, billing_date)
+
+        except Exception as ex:
+            print(ex + "\n(kwh= 0 and amount=0 will be returned)")
+
+    amount = get_amount(kwh, days)
+
     return amount, kwh
 
 

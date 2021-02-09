@@ -19,3 +19,7 @@ class TestAccount(unittest.TestCase):
     def testInstanceSetMember(self):
         self.account.member = "member_id"
         assert self.account.member == "member_id"
+
+    def testInstanceSetAccountId(self):
+        self.account.account_id = "account-abc"
+        assert self.account.account_id == "account-abc"
